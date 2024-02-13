@@ -1,0 +1,21 @@
+/*何もないものは、htmlのタグを指定する*/
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+input, button {
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 16px;
+}
+button {
+  cursor: pointer;
+}
+/*.はclass名を指定する*/
+.container {
+  text-align: center;
+}

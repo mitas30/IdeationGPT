@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>評価基準の選択</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/func3.css')}}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="buttons">
+            <button id="select-button" class="tab-button active">選択式</button>
+            <button id="describe-button" class="tab-button">自由式</button>
+        </div>
+        <div class="content-window">
+            <div id="select-content" class="content-item">
+                <form id="selectcriterias" action="/input/receive_criteria/" method="post">
+                    <p>評価基準をいくつか選んでください</p>
+                    <label><input type="checkbox" name="criteria" value='1'>独創性</label>
+                    <label><input type="checkbox" name="criteria" value='2'>革新性</label><br>
+                    <label><input type="checkbox" name="criteria" value='3'>実用性</label>
+                    <label><input type="checkbox" name="criteria" value='4'>持続可能性</label><br>
+                    <label><input type="checkbox" name="criteria" value='5'>実現可能性</label>
+                    <label><input type="checkbox" name="criteria" value='6'>効率性</label><br>
+                    <label><input type="checkbox" name="criteria" value='7'>アイデアのスケーラビリティ</label>
+                    <label><input type="checkbox" name="criteria" value='8'>UX</label>
+                    <button id="confirm-button" type="submit">確定</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

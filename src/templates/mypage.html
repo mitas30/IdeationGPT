@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>マイページ</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/mypage.css')}}">
+</head>
+<body>
+    <div class="profile-container">
+        <img src="profile-picture.jpg" alt="プロフィール画像" class="profile-picture">
+        <h1 class="user-name">ユーザー名</h1>
+        <p class="email">email@example.com</p>
+    </div>
+    <h1>スレッド一覧</h1>
+    <button id="create-thread">新規スレッド作成</button>
+    <div id="thread-list"></div>
+    <script src="{{url_for('static',filename='js/mypage.js')}}"></script>
+</body>
+</html>

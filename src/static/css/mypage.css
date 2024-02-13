@@ -1,0 +1,62 @@
+.profile-container {
+    width: 300px;
+    margin: auto;
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 20px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+.user-name {
+    font-size: 20px;
+    color: #333;
+}
+
+.email {
+    color: #666;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+#thread-list {
+    width: 80%;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#thread-list div {
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+}
+
+#create-thread {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+

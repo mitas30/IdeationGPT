@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイデア提出フォーム</title>
+<link rel="stylesheet" href="{{url_for('static',filename='css/input_ideas.css')}}">
+</head>
+<body>
+  <div class="idea-form-container">
+    <form id="ideaform">
+      <label for="ideaname">アイデア名を入力してください:</label>
+      <textarea id="ideaname" name="name" rows="1" cols="50" required maxlength="200"></textarea>
+      <label for="core" class="input_forms">アイデアの核心を記述してください:</label>
+      <textarea id="core" rows="6" cols="100" required></textarea>
+      <label for="reqtech" class="input_forms">どんな技術が必要か完結に書いてください:</label>
+      <textarea id="reqtech" rows="6" cols="100" required></textarea>
+      <label for="effectiveness" class="input_forms">そのアイデアは問題にどのように有効なのでしょうか？:</label>
+      <textarea id="effectiveness"  rows="6" cols="100" required></textarea>
+      <label for="usecase" class="input_forms">ユースケースを書いてください:</label>
+      <textarea id="usecase"  rows="6" cols="100" required></textarea>
+      <div class="form-controls">
+        <button type="reset">書き直す</button>
+        <button type="submit">次のアイデア</button>
+        <button type="button" class="submit-btn" id="finishBtn">入力の終了</button>
+      </div>
+    </form>
+  </div>
+<script src="{{url_for('static',filename='js/input_ideas.js')}}"></script>
+</body>
+</html>

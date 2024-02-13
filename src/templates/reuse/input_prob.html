@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input Ideas</title>
+<link rel="stylesheet" href="{{url_for('static',filename='css/input_problem.css')}}">
+</head>
+<body>
+<div class="container">
+  <form id="probForm" action="/input/receive_prob/" method="post">
+    <p>あなたが解決したい問題を入力してください</p>
+    <textarea name="problem" rows="4" cols="50"></textarea>
+    <br>
+    <button id="nextButton" type="submit">送信</button>
+  </form>
+</div>
+</body>
+</html>

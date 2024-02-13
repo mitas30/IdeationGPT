@@ -1,0 +1,32 @@
+.input_forms{
+  display: block;
+  color: gray;
+}
+/*note: 何もなしはtag .はclass #はidで右に行くほど優先順位高め*/
+.idea-form-container {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-controls button {
+  margin: 5px;
+}
+
+textarea{
+  left: 45%;
+  resize: none;
+}
+
+html,body{
+  width: 100%;
+  height: 100%;
+}
+
+#finishBtn{
+  width: 20%;
+  float: right;
+}

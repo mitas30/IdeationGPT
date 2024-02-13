@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>サインアップ</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/signup.css')}}">
+</head>
+<body>
+    <div>
+        <h2>サインアップ</h2>
+        <form id="signup-form">
+            <input type="text" id="signup-nickname" placeholder="ニックネーム" maxlength="15" required>
+            <input type="password" id="signup-password" placeholder="パスワード" required>
+            <button type="submit">サインアップ</button>
+        </form>
+        <p id="signup-message"></p>
+        <p>すでにアカウントを持っていますか？ <a href="/auth_user/login">ログインはこちら</a></p>
+    </div>
+    <script src="{{url_for('static',filename='js/signup.js')}}"></script>
+</body>
+</html>
