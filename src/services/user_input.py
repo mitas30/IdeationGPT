@@ -1,6 +1,5 @@
 from typing import List
 import deepl,os
-import redis
 from models.mongo import ThreadAdmin as TAdmin
 
 translator=deepl.Translator(os.getenv("DEEPL_API_KEY"))
