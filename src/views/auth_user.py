@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify,render_template,request,session
-from services.auth_user import create_user, authenticate_user,createThread
-import services.auth_user as AuthUser
+from services.auth_user import create_user, authenticate_user,createThread,fetchThread
 auth_user = Blueprint('auth_user', __name__)
 
 @auth_user.route('/signup_api', methods=['POST'])
@@ -39,7 +38,7 @@ def red_mypage():
 
 #スレッドの作成
 @auth_user.route('/create_thread_api')
-def create_thread():
+def c_thread():
     user_name=session.get('user')
     thread_id=createThread(user_name)
     session['thread_id']=thread_id
@@ -49,5 +48,5 @@ def create_thread():
 @auth_user.route('/fetch_thread_api')
 def fetch_thread():
     user_name=session.get('user')
-    threads=AuthUser.fetchThread(user_name)
+    threads=fetchThread(user_name)
     return jsonify({"threads":threads})

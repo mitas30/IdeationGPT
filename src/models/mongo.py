@@ -36,14 +36,35 @@ class ThreadAdmin:
         self.users_collection.update_one({"_id":ObjectId(thread_id)},{"$set":{"problem":problem,"progress":1}})
         
     def addCriterias(self,thread_id:str,criteria_list:List[str]):
+        print(thread_id)
         self.users_collection.update_one({"_id":ObjectId(thread_id)},{"$set":{"criterias":criteria_list,"progress":2}})
         
-    def fetchThreads(self,user_name:str)->List[dict[str,str]]:
+    def fetchThreads(self,user_name:str)->List[dict[str,str,int]]:
         cursor=self.users_collection.find({"u_id":user_name})
         ret_list=[]
         for doc in cursor:
             thread_id=str(doc.get("_id"))
             problem=doc.get("problem","")
-            ret_list.append({"thread_id":thread_id,"problem":problem})
+            progress=doc.get("progress")
+            ret_list.append({"thread_id":thread_id,"problem":problem,"progress":progress})
         return ret_list
-            
+    
+    def fetchProblem(self,thread_id:str)->str:
+        doc=self.users_collection.find_one({"_id":ObjectId(thread_id)})
+        return doc.get("problem")
+    
+    def fetchCriterias(self,thread_id:str)->List[str]:
+        doc=self.users_collection.find_one({"_id":ObjectId(thread_id)})
+        return doc.get("criterias")
+        
+class IdeaAdmin:
+    def __init__(self):
+        db = client["ideation_gpt"]
+        self.users_collection = db["ideas"]
+        
+    def storageIdea(self,normalize_data=dict[str,str,str,str,str,str])->None:
+        return self.users_collection.insert_one(normalize_data)
+        
+    
+    
+           

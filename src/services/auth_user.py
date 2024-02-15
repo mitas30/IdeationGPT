@@ -1,6 +1,7 @@
 from models.mongo import AuthUser,ThreadAdmin
 from werkzeug.security import check_password_hash
 from typing import List
+import deepl,os
 
 auth=AuthUser()
 
@@ -21,7 +22,13 @@ def createThread(user_name:str):
     return t_admin.createNewThread(user_name)
 
 def fetchThread(user_name:str)->List[dict[str,str]]:
-    '''databaseからの操作を返すだけ'''
+    '''databaseから取ってきて、日本語訳の問題を入れる'''
+    deepl_api_key=os.getenv("DEEPL_API_KEY")
+    translator=deepl.Translator(deepl_api_key)
     t_admin=ThreadAdmin()
-    return t_admin.fetchThreads(user_name)
+    thread_list=t_admin.fetchThreads(user_name)
+    for thread in thread_list:
+        thread['jp_problem']=translator.translate_text(thread['problem'],target_lang='JA').text
+    return thread_list
     
+

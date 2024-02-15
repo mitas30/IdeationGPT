@@ -1,7 +1,11 @@
+import sys
+from pathlib import Path
+root_path=Path(__file__).parent.parent.parent
+sys.path.append(str(root_path))
 import google.generativeai as genai
 import re,random,os
 from random_word import Wordnik
-from typing import List,Tuple
+from typing import List,Tuple,Union
 from LogSettings import logger,logging
 from threading import Thread
 from deep_translator import GoogleTranslator
@@ -32,16 +36,70 @@ You need to follow the <format> below and attach a lengthy explanation of approx
 Each idea needs to be described in sufficient detail so that it can form the basis for a requirements definition. 
 Therefore, although a 400-word explanation may seem lengthy at first glance, it is necessary to write in such detail to properly convey the concept."""
 
-    def _extractIdea(self,idea_response: str) -> list:
-       """falseFaceにおいて、responseからアイデアを'num_idea'個抽出する"""
-       # アイデアのセクションを区切る正規表現パターン
-       pattern = r'Idea\s*\d+\s*:'
-       sections = re.split(pattern, idea_response)
-       # 最初の空要素をスキップし、余分な空行を削除
-       return [re.sub(r"\n{2,}", '\n', section).strip() for section in sections[1:6]]
+    def _normalizeProcess(self,full_idea:str)->Union[dict[str,str,str,str,str],None]:
+        '''格納したアイデアを正規化する'''
+        # タイトルのノイズを取り除く正規表現パターン
+        title_noise_pattern = r"\([\w\s]+\)|\"|\*"
+
+        # 各セクションを分割する正規表現パターン
+        section_pattern = r"(Core [I,i]dea:|Technologies and Materials Used:|Revised Approach to Problem-Solving:|Concrete Use Cases:)"
+
+        # セクションごとに分割
+        sections = re.split(section_pattern, full_idea)
+        if len(sections)!=9:
+            print(f"正規化エラー:正常なsectionは9つに対して、今回は{str(len(sections))}")
+            print(f"errorが出た文章は、\n{full_idea[:300]}")
+            return None
+
+        # タイトルからノイズを除去して辞書に格納
+        cleaned_title = re.sub(title_noise_pattern, '', sections[0]).strip()
+        parsed_dict = {"Title": cleaned_title}
+
+        for i in range(1, len(sections), 2):
+            #section名がCore ideaのとき、Core Ideaに変化させる
+            section_name = re.sub(r":","",sections[i].strip().replace("Core idea","Core Idea"))
+            #\* : \\nを消す
+            pattern=r"\*|:"
+            content = re.sub(pattern,"",sections[i + 1].strip().replace("\\n","\n"))
+            parsed_dict[section_name] = content
+
+        return parsed_dict
+    
+    def _extractIdea(self,idea_response: str) -> list[dict[str,str,str,str,str]]:
+        """responseからアイデアを'5'個抽出して、正規化した辞書形式で返却する"""
+        # アイデアのセクションを区切る正規表現パターン
+        pattern = r'Idea\s*\d+\s*:'
+        deivide_str = re.split(pattern, idea_response)
+        # 最初の空要素をスキップし、空の行を削除したアイデアのlist
+        idea_list=[re.sub(r"\n{2,}", '\n', section).strip() for section in deivide_str[1:6]]
+        normalize_idea_list=[]
+        for idea in idea_list:
+            normalize_idea=self._normalizeProcess(idea)
+            #正常に区切れた場合
+            if normalize_idea!=None:
+                normalize_idea_list.append(normalize_idea)
+        return normalize_idea_list
+    
+    def serializeDict(self,idea:dict[str,str,str,str,str])->str:
+        """構造化されたアイデアをstringにシリアライズする"""
+        s_data=f"""{idea['Title']}
+        Core Idea:{idea['Core Idea']}
+        Technologies and Materials Used:{idea['Technologies and Materials Used']}
+        Revised Approach to Problem-Solving:{idea['Revised Approach to Problem-Solving']}
+        Concrete Use Cases:{idea['Concrete Use Cases']}"""
+        return s_data
+    
+    def serializeDictForList(self,idea_list:List[dict[str,str,str,str,str]])->List[str]:
+        """構造化されたアイデアをstringにシリアライズする"""
+        ret_list=[]
+        for idea in idea_list:
+            s_data=self.serializeDict(idea)
+            ret_list.append(s_data)
+        return ret_list        
 
 class FalseFacer(Ideator):
     def _extractReverseAssumption(self,idea_response:str)->list:
+        '''ここ、indexerrorが起きる可能性あり'''
         tmp_list=re.split('[Rr]eversed\s*[Aa]ssumptions[^:]*:',idea_response)
         pattern="[a-cA-C]:"
         ret_list=re.split(pattern,tmp_list[1])
@@ -74,8 +132,12 @@ class FalseFacer(Ideator):
             "role":"user","content":{user_message}"""
             
         api_response = client.generate_content(message).text
-        reverse_assumption_list=self._extractReverseAssumption(api_response)
-        idea_list=self._extractIdea(api_response)
+        try:
+            reverse_assumption_list=self._extractReverseAssumption(api_response)
+            idea_list=self._extractIdea(api_response)
+        except IndexError:
+            print(api_response)
+            print("error")
         return idea_list,reverse_assumption_list
         
     def _falseFaceSecondHalf(self,uans2_rev_assumption:str,count:int):
@@ -119,6 +181,8 @@ class FalseFacer(Ideator):
 
 class IdeaBox(Ideator):
     """IdeaBoxという発想法を行えるclass"""
+    
+    #TODO ここ、たまにバグるから、そのときはもう一回行う処理をする
     def _selectRandAtt4Prob(self,attribute_list:list)->List[str]:
         """4つのパラメータに対する属性の組み合わせSを５つ集めたstrが3つ集まったリスト(len(3)のstrのlist)が出力される"""
         mem=[]
@@ -238,7 +302,7 @@ class BruteThinker(Ideator):
         ret=random_word_gerenerator.get_random_words(includePartOfSpeech=include_part_of_speech,minCorpusCount=min_corpus_count,minLength=min_length,limit=num_words)
         return ret
     
-    #TO DO:1.5つのアイデアを出すように指定する必要がある 2.450wordsで出力してくれるのか確認する必要がある
+    #TODO:出力最大長の問題から、brutethinkは2つに分ける(属性選択とアイデア出力)
     def _doBruteThink(self,r_word_str:str)->list:
         system_message="You are a maker with high creativity and implementation skills.  Please utilize your creativity to come up with effective ideas for the problem at hand."
         user_example_problem="How can we make public transportation more appealing to commuters?"
@@ -257,31 +321,10 @@ class BruteThinker(Ideator):
         "role":"assistant", "content":{assistant_answer},
         "role":"user","content":{user_message}"""
         
-        #改善処理
-        
-        print(uex_message)
-        print('-'*80)
-        '''
-        print(assistant_answer)
-        print('-'*80)
-        print(user_message)
-        print('-'*80)
-        chunk_list=split_string_to_chunks(uex_message,4000)
-        for chunk in chunk_list:
-            translated=GoogleTranslator(source='en',target='ja').translate(text=chunk)
-            print(translated)
-        print('-'*80)
-        chunk_list=split_string_to_chunks(assistant_answer,4000)
-        
-        print('-'*80)
-        print(user_message)
-        
-
         #実際の処理
         try:
             response = client.generate_content(message)
             api_response=response.text
-            print(r_word_str,api_response,sep='\n')
         except ValueError:
             print(f"エラー:{response}")
         idea_list=self._extractIdea(api_response)
@@ -290,9 +333,9 @@ class BruteThinker(Ideator):
             print(f"btのアイデア数は、{str(len(idea_list))}")
             self.improve_idea_list.extend(idea_list)
         else:
-            print(f"btのアイデア数は、{str(len(idea_list))}")
-            raise Exception("InvalidDivideAtIdeaBoxError")
-        '''
+            print(f"Idea数が少ない or 区切れていないエラー:btのアイデア数は、{str(len(idea_list))}")
+            raise Exception("InvalidDivideAtBruteThinkError")
+        
         
     def _forThread(self,r_word_str:str,count:int):
         logger.log(logging.INFO,f"bruteThinkの{count+1}回目の呼び出し")
@@ -301,7 +344,7 @@ class BruteThinker(Ideator):
     def bruteThink(self)->None:
         r_word_list=self._generateRandomWords(3)
         threads=[]
-        for count in range(1):
+        for count in range(3):
             thread=Thread(target=self._forThread,args=(r_word_list[count],count))
             threads.append(thread)
             thread.start()
@@ -312,3 +355,6 @@ class BruteThinker(Ideator):
 def split_string_to_chunks(long_string, chunk_size):
     """長い文字列を指定されたサイズのチャンクに分割する関数。"""
     return [long_string[i:i + chunk_size] for i in range(0, len(long_string), chunk_size)]
+
+
+

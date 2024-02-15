@@ -49,5 +49,16 @@ def addProblemToThread(thread_id:str,problem:str):
     thread_admin=TAdmin()
     thread_admin.addProblem(thread_id,problem)
 
+#problemを取ってくる func1で使用
+def fetchProblemFromThread(thread_id:str)->str:
+    thread_admin=TAdmin()
+    problem=thread_admin.fetchProblem(thread_id)
+    return problem
+
+#criteriaを取ってくる func3で使用
+def fetchCriteriaFromThread(thread_id:str)->List[str]:
+    thread_admin=TAdmin()
+    criterias=thread_admin.fetchCriterias(thread_id)
+    return criterias
         
     

@@ -6,7 +6,7 @@ func2 = Blueprint('func2', __name__)
 def core_prog():
     return render_template('func2/func2_wait.html')
 
-#improve_ideaのAPI部分
+#improve_ideaのAPI部分(使用しない)
 @func2.route('/improve_idea_api/')
 def improveIdea():
     pass

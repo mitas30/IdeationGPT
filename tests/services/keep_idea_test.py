@@ -1,0 +1,27 @@
+import unittest,sys
+from pathlib import Path
+root_path=Path(__file__).parent.parent.parent
+sys.path.append(str(root_path))
+from src.services.keep_idea import IdeaHandler
+
+
+i_handler=IdeaHandler()
+
+class UTest(unittest.TestCase):
+    def test_normalizeProcess(self):
+        str1=""""Neuro-Cybernetic Augmentation" (Attribute Set 2)
+Core Idea:"Neuro-Cybernetic Augmentation" **takes human enhancement to the next level by seamlessly integrating advanced cybernetic technology with the human nervous system. This groundbreaking device enhances memory, cognitive processing speed, and analytical capabilities, enabling individuals to operate at peak mental performance. Its minimalist design ensures that the augmentation is both discreet and aesthetically pleasing, allowing users to embrace their enhanced abilities without compromising their personal style.       
+Technologies and Materials Used:The Neuro-Cybernetic Augmentation consists of a series of miniaturized cybernetic implants that are surgically interfaced with the user's neural pathways. These implants utilize advanced biocompatible materials that seamlessly integrate with human tissue, minimizing any potential discomfort or rejection. The device leverages breakthrough advancements in neuroscience to stimulate specific brain regions responsible for memory formation, information processing, and decision-making. Its minimalist design incorporates discreet neural interfaces that communicate wirelessly with external devices, allowing users to control and monitor their augmentation with ease.
+Revised Approach to Problem-Solving:The Neuro-Cybernetic Augmentation addresses the limitations of human memory and cognitive abilities by providing direct enhancements to the brain. It utilizes sophisticated algorithms and machine learning techniques to analyze and optimize neural pathways, resulting in improved memory recall, faster processing speeds, and enhanced analytical skills. The device's minimalist design and user-friendly interface make it accessible to individuals from all walks of life, empowering them to reach new heights of mental performance.
+Concrete Use Cases:The Neuro-Cybernetic Augmentation has far-reaching applications in various fields. Professionals in demanding cognitive roles, such as scientists, engineers, and analysts, can benefit from its ability to augment their memory and analytical skills. Students can utilize it to enhance their learning efficiency and academic performance. Individuals with memory impairments or cognitive decline can also find solace in this technology, as it offers the potential to restore or even improve their cognitive abilities. The Neuro-Cybernetic Augmentation truly embodies the fusion of human intelligence with advanced technology, opening up new possibilities for human potential."""
+        correct1={'Title': 'Neuro-Cybernetic Augmentation',
+'Core Idea': '"Neuro-Cybernetic Augmentation" takes human enhancement to the next level by seamlessly integrating advanced cybernetic technology with the human nervous system. This groundbreaking device enhances memory, cognitive processing speed, and analytical capabilities, enabling individuals to operate at peak mental performance. Its minimalist design ensures that the augmentation is both discreet and aesthetically pleasing, allowing users to embrace their enhanced abilities without compromising their personal style.',
+'Technologies and Materials Used': "The Neuro-Cybernetic Augmentation consists of a series of miniaturized cybernetic implants that are surgically interfaced with the user's neural pathways. These implants utilize advanced biocompatible materials that seamlessly integrate with human tissue, minimizing any potential discomfort or rejection. The device leverages breakthrough advancements in neuroscience to stimulate specific brain regions responsible for memory formation, information processing, and decision-making. Its minimalist design incorporates discreet neural interfaces that communicate wirelessly with external devices, allowing users to control and monitor their augmentation with ease.",
+'Revised Approach to Problem-Solving': "The Neuro-Cybernetic Augmentation addresses the limitations of human memory and cognitive abilities by providing direct enhancements to the brain. It utilizes sophisticated algorithms and machine learning techniques to analyze and optimize neural pathways, resulting in improved memory recall, faster processing speeds, and enhanced analytical skills. The device's minimalist design and user-friendly interface make it accessible to individuals from all walks of life, empowering them to reach new heights of mental performance.",
+'Concrete Use Cases': 'The Neuro-Cybernetic Augmentation has far-reaching applications in various fields. Professionals in demanding cognitive roles, such as scientists, engineers, and analysts, can benefit from its ability to augment their memory and analytical skills. Students can utilize it to enhance their learning efficiency and academic performance. Individuals with memory impairments or cognitive decline can also find solace in this technology, as it offers the potential to restore or even improve their cognitive abilities. The Neuro-Cybernetic Augmentation truly embodies the fusion of human intelligence with advanced technology, opening up new possibilities for human potential.'}
+        out=i_handler._normalizeProcess(str1)
+        self.assertEqual(out,correct1)
+        
+if __name__ =='__main__':
+    unittest.main()
+        

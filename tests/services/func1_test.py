@@ -6,7 +6,7 @@ root_path=Path(__file__).parent.parent.parent
 sys.path.append(str(root_path))
 
 from src.LogSettings import logger,logging
-import src.services.func1 as Func1
+import src.services.GPT.func1 as Func1
 
 class TestUnitFalseFace:
     """FalseFace(func1)をtestするためのobject"""
