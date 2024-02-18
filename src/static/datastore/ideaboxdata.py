@@ -1,13 +1,40 @@
-fh_common_user_message_b="""Please follow the instructions according to the following <Guide>.\n<Guide>\nIdea Box Method: A Creative Blueprint\nOverview:The Idea Box method is a systematic approach to generating innovative ideas. It involves identifying key parameters of a problem or project and exploring various combinations of these parameters to discover novel solutions.
+fh_common_user_message_b="""Please follow the instructions according to the following <Guide>.
+\n<Guide>
+Idea Box Method: A Creative Blueprint
+Overview:The Idea Box method is a systematic approach to generating innovative ideas. It involves identifying key parameters of a problem or project and exploring various combinations of these parameters to discover novel solutions.
+
 <problem>"""
 
-fh_common_user_message_a="""\nSteps:\n1.Identify Parameters:\nList up four essential aspects or features related to the challenge <problem>. Consider whether this challenge would exist without this parameter. Also, output according to the following <format1>.\nExample problem: Improve the design of a laundry basket.\nExample Parameters: Material, Shape, Finish, Placement\n\n<format1>\nParameter: [Output parameters A, B, C, D for the challenge, separated by commas]\n\n2.List Variations:\nWrite down ten variations for each parameter. However, output according to the following <format2>.\nExample problem: Improve the design of a laundry basket.\nExample Parameters: Material, Shape, Finish, Placement\nExample varitations:\n1.Wicker, Plastic, Paper, Metal, Mesh, Bamboo, Rattan, Silicone, Fabric, Recycled materials\n2.Square, Cylinder, Rectangle, Hexagon, Cube, Oval, Round, Triangular, Spherical, Irregular\n3.Natural, Tinted, Transparent, Reflective, Neon, Matte, Glossy, Textured, Lacquered, Weathered\n4.Floor mounted, Ceiling suspended, Wall mounted, Basement entrance, Door hangings, Under-bed, Corner, Freestanding, Modular, Portable\n\n<format2>\n1. [Output attributes A, B, C...I,J for the first parameter, separated by commas]\n2. [Output attributes A, B, C...I,J for the second parameter, separated by commas]\n3. [Output attributes A, B, C...I,J for the third parameter, separated by commas]\n4. [Output attributes A, B, C...I,J for the fourth parameter, separated by commas]\n\nAdvantages:\nEncourages systematic exploration of options.\nHelps in visualizing various combinations and their potential.\nAids in breaking down complex problems into manageable components."""
+fh_common_user_message_a="""\n\nSteps:\n1.Identify Parameters:\nList up four essential aspects or features related to the challenge <problem>. Consider whether this challenge would exist without this parameter. Also, output according to the following <format1>.\nExample problem: Improve the design of a laundry basket.\nExample Parameters: Material, Shape, Finish, Placement
+\n<format1>
+Parameters: [Output parameters A, B, C, D for the challenge, separated by commas]
+\n2.List Variations:\nWrite down ten variations for each parameter. However, output according to the following <format2>.
+\n<format2>
+variations:
+1. [Output attributes A, B, C...I,J for the first parameter, separated by commas]
+2. [Output attributes A, B, C...I,J for the second parameter, separated by commas]
+3. [Output attributes A, B, C...I,J for the third parameter, separated by commas]
+4. [Output attributes A, B, C...I,J for the fourth parameter, separated by commas]
 
-fh_aans_message="""Parameter: Educational Content, Accessibility, Technological Integration, Teacher Training\n\n1.Interactive, Multilingual, Culturally Diverse, STEM-focused, Project-based Learning, Adaptive Learning, Holistic Education, Cross-curricular, Inquiry-based Learning, Experiential Learning\n2.Online Platforms, Community Centers, Mobile Learning, Radio Broadcasts, Print Materials, Sign Language Integration, Braille Resources, Text-to-Speech, Flexible Scheduling, Remote Access Tools\n3.Virtual Reality, Artificial Intelligence, Gamification, Cloud Computing, Educational Apps, Blockchain for Education, Augmented Reality, Big Data Analytics, Adaptive Algorithms, IoT Integration\n4.In-service Workshops, Online PD Courses, Peer Collaboration Networks, Teaching Aids, Classroom Management Techniques, Diversity Training, Pedagogical Innovation, Digital Literacy, Special Needs Education, Leadership Development"""
+Example problem: Improve the design of a laundry basket.
+Example Parameters: Material, Shape, Finish, Placement
+Example variations:
+1.Wicker, Plastic, Paper, Metal, Mesh, Bamboo, Rattan, Silicone, Fabric, Recycled materials
+2.Square, Cylinder, Rectangle, Hexagon, Cube, Oval, Round, Triangular, Spherical, Irregular
+3.Natural, Tinted, Transparent, Reflective, Neon, Matte, Glossy, Textured, Lacquered, Weathered
+4.Floor mounted, Ceiling suspended, Wall mounted, Basement entrance, Door hangings, Under-bed, Corner, Freestanding, Modular, Portable"""
+
+fh_aans_message="""Parameter: Educational Content, Accessibility, Technological Integration, Teacher Training
+variations:
+1.Interactive, Multilingual, Culturally Diverse, STEM-focused, Project-based Learning, Adaptive Learning, Holistic Education, Cross-curricular, Inquiry-based Learning, Experiential Learning
+2.Online Platforms, Community Centers, Mobile Learning, Radio Broadcasts, Print Materials, Sign Language Integration, Braille Resources, Text-to-Speech, Flexible Scheduling, Remote Access Tools
+3.Virtual Reality, Artificial Intelligence, Gamification, Cloud Computing, Educational Apps, Blockchain for Education, Augmented Reality, Big Data Analytics, Adaptive Algorithms, IoT Integration
+4.In-service Workshops, Online PD Courses, Peer Collaboration Networks, Teaching Aids, Classroom Management Techniques, Diversity Training, Pedagogical Innovation, Digital Literacy, Special Needs Education, Leadership Development"""
 
 lh_user_example_parameter="Educational Content, Accessibility, Technological Integration, Teacher Training"
 
-lh_user_example_attributes="""1:Culturally Diverse,Community Centers,Big Data Analytics,Peer Collaboration Networks
+lh_user_example_attributes="""varitations:
+1:Culturally Diverse,Community Centers,Big Data Analytics,Peer Collaboration Networks
 2:Experiential Learning,Braille Resources,Blockchain for Education,Pedagogical Innovation
 3:Holistic Education,Mobile Learning,Artificial Intelligence,Digital Literacy
 4:Adaptive Learning,Online Platforms,Educational Apps,Online PD Courses

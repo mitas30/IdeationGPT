@@ -1,6 +1,6 @@
 from flask import request,render_template,Blueprint,session,jsonify
 from redis import Redis
-from services.GPT.func3 import IdeaEvaluator
+from services.func3 import EvaluateGPT
 
 # Blueprintの作成
 func3 = Blueprint('func3', __name__)
