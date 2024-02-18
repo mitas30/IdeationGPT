@@ -4,11 +4,11 @@ from typing import List
 from .func1 import Ideator
 from models.mongo import IdeaAdmin
 from LogSettings import logger,logging
-import re,deepl,os,concurrent.futures
+import re,deepl,os,concurrent.futures,copy
 
 g_api_key=os.getenv("GEMINI_API_KEY")
 GPT_MODEL="gpt-4-0125-preview"
-GEMINI_MODEL="gemini_pro"
+GEMINI_MODEL="gemini-pro"
 
 genai.configure(api_key=g_api_key)
 genai.GenerationConfig(candidate_count=1)
@@ -65,8 +65,8 @@ class IdeaEvaluator(Ideator):
         idea_num=self._extractPoints(eval_responses)
         return idea_num
                
-    def sortByScores(self,select_idea_num:InterruptedError)->None:
-        """self.scoreの降順で並べ替えて、great_ideasを選出する"""
+    def sortByScores(self,select_idea_num:int)->None:
+        """self.scoreの降順で並べ替えて、great_ideasを選出し、self.great_ideaに追加する"""
         self.idea_score_list.sort(key=lambda pair:pair[0],reverse=True)
         #上位の10個(現在は5つ)のみをgreat_ideaに選出する
         for i in range(select_idea_num):
@@ -151,7 +151,7 @@ Concrete Use Cases:This platform caters to a wide range of emotional interaction
 {"role":"assistant", "content": assistant_answer_message},
 {"role":"user","content":user_message}]
 
-        api_res=self.client.chat.completions.create(model=GPT_MODEL,messages=message,max_tokens=4000)
+        api_res=self.client.chat.completions.create(model=GPT_MODEL,messages=message,max_tokens=1500)
         response=""  
         try:
             response = api_res.choices[0].message.content
@@ -232,16 +232,18 @@ Concrete Use Cases:This platform caters to a wide range of emotional interaction
 "role":"assistant", "content": {assistant_answer_message},
 "role":"user","content":{user_message}'''
 
-        api_res=self.client.generate_content(message)
-        response=""  
-        try:
-            response = api_res.text
-        except ValueError:
-            logger.log(logging.WARNING,f"Evaluate_返信が単一で無いエラー:")
-            response=""
-            for part in response.result.parts:
-                response+=part
-                print(part)
+        current_roop=0
+        max_roop=3
+        while current_roop<max_roop:  
+            try:
+                api_res=self.client.generate_content(message)
+                response = api_res.text
+                break
+            except ValueError:
+                logger.log(logging.WARNING,f"In Evaluate:返信が単一では無いエラー")
+                current_roop+=1
+        if current_roop==max_roop:
+            raise RuntimeError("評価を3回試みたが全て失敗した")
         return response
 
 class IdeaHandler:
@@ -249,10 +251,12 @@ class IdeaHandler:
         pass
     
     def storageIdea(self,idea_structured:dict[str,str,str,str,str],thread_id:str,is_great:bool=False)->None:
-        """使用したIdea、またはgreatなアイデアを格納する。"""
+        """使用したIdea、またはgreatなアイデアを格納する。
+        ただし、クライアント側にmongoのデータを渡さないためにidea_structuredは複製する"""
         i_admin=IdeaAdmin()
-        idea_structured['thread_id']=thread_id
+        save_idea=copy.deepcopy(idea_structured)
+        save_idea['thread_id']=thread_id
         if is_great==True:
-            idea_structured['is_great']=True
-        i_admin.storageIdea(idea_structured)
+            save_idea['is_great']=True
+        i_admin.storageIdea(save_idea)
         

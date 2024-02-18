@@ -1,7 +1,7 @@
 from flask import Blueprint,jsonify,session
 from threading import Thread
 from services.func1 import FFGemini,IBGemini,BTGemini
-from services.func3 import EvaluateGPT,IdeaHandler
+from services.func3 import EvaluateGPT,IdeaHandler,EvaluateGemini
 from services.func2 import InoveteGemini
 from services.user_input import fetchProblemFromThread,fetchCriteriaFromThread
 from LogSettings import logging,logger
@@ -19,12 +19,12 @@ def createIdeas(problem:str)->List[dict[str,str,str,str,str]]:
     thread2=Thread(target=ib.ideaBox)
     bt=BTGemini(problem=problem)
     thread3=Thread(target=bt.bruteThink)
-    #thread1.start()
+    thread1.start()
     thread2.start()
-    #thread3.start()
-    #thread1.join()
+    thread3.start()
+    thread1.join()
     thread2.join()
-    #thread3.join()
+    thread3.join()
     #debug 出してくるアイデアの数がちゃんと15ずつであるか確認する
     idea_list=falsefacer.improve_idea_list
     print("ffのアイデアの数",str(len(idea_list)))
@@ -42,7 +42,7 @@ def createIdeas(problem:str)->List[dict[str,str,str,str,str]]:
     
 def evaluateIdeas(problem,idea_list:List[dict[str,str,str,str,str]],criterias:List[str],is_improve:bool):
     '''アイデア評価のstep'''
-    evaluator=EvaluateGPT(problem,idea_list,criterias)
+    evaluator=EvaluateGemini(problem,idea_list,criterias)
     idea_num=evaluator.concurrentEvaluate()
     logger.log(logging.INFO,f"評価済みアイデアの数:{idea_num}個")
     for score in evaluator.idea_score_list:
@@ -86,16 +86,17 @@ def improveIdeas(problem:str,idea_list:List[dict[str,str,str,str,str]])->List[di
         print(candidate_idea['Title'])
     return candidate_ideas
     
-
 #improve_ideaのAPI部分
 @func1.route('/make_idea_api/')
 def makeIdea():
     problem=fetchProblemFromThread(session['thread_id'])
     criterias=fetchCriteriaFromThread(session['thread_id'])
     candidate_ideas=createIdeas(problem)
-    return jsonify()
     great_ideas=evaluateIdeas(problem,candidate_ideas,criterias,False)
     improve_ideas=improveIdeas(problem,great_ideas)
     idea_list=evaluateIdeas(problem,improve_ideas,criterias,True)
-    #TODO ObjectIDの排除
+    count=1
+    for idea in idea_list:
+        logger.log(logging.INFO,f"idea{count}:\n{idea}")
+        count+=1
     return jsonify({"idea":idea_list})

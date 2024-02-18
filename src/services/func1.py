@@ -39,28 +39,32 @@ Therefore, although a 400-word explanation may seem lengthy at first glance, it 
     def _normalizeProcess(self,full_idea:str)->Union[dict[str,str,str,str,str],None]:
         '''格納したアイデアを正規化する'''
         # タイトルのノイズを取り除く正規表現パターン
-        title_noise_pattern = r"\([\w\s]+\)|\"|\*"
+        title_noise_pattern = r"\([\w\s]+\)|[\"\*\<\>]"
 
         # 各セクションを分割する正規表現パターン
-        section_pattern = r"(Core [I,i]dea:|Technologies and Materials Used:|Revised Approach to Problem-Solving:|Concrete Use Cases:)"
+        section_pattern = r"([cC]ore [Ii]dea:|[Tt]echnologies and [Mm]aterials [uU]sed:|[rR]evised [aA]pproach to [pP]roblem-[sS]olving:|[cC]oncrete [uU]se [cC]ases:)"
 
         # セクションごとに分割
-        sections = re.split(section_pattern, full_idea)
+        sections = re.split(section_pattern, re.sub("\*","",full_idea))
         if len(sections)!=9:
-            logger.log(logging.ERROR,f"正規化エラー:正常なsectionは9つに対して、今回は{str(len(sections))}\nerrorが出た文章:{full_idea[:100]}")
+            logger.log(logging.ERROR,f"正規化エラー:正常なsectionは9つに対して、今回は{str(len(sections))}")
+            with open("D:\Programing\自主制作(code)\IdeationGPT\src\static\datastore\error_log.txt","a",encoding="utf-8") as file:
+                file.write(f"正規化エラー:正常なsectionは9つに対して、今回は{str(len(sections))}\n")
+                i=1
+                for section in sections:
+                    file.write(f"section{i}:{section}\n")
+                    i+=1
             return None
 
         # タイトルからノイズを除去して辞書に格納
-        cleaned_title = re.sub(title_noise_pattern, '', sections[0]).strip()
-        parsed_dict = {"Title": cleaned_title}
-
-        for i in range(1, len(sections), 2):
-            #section名がCore ideaのとき、Core Ideaに変化させる
-            section_name = re.sub(r":","",sections[i].strip().replace("Core idea","Core Idea"))
+        keys = ["Title","Core Idea", "Technologies and Materials Used", "Revised Approach to Problem-Solving", "Concrete Use Cases"]
+        sections[0] = re.sub(title_noise_pattern, '', sections[0]).strip()
+        parsed_dict={}
+        for i in range(0,9,2):
             #\* : \\nを消す
             pattern=r"\*|:"
-            content = re.sub(pattern,"",sections[i + 1].strip().replace("\\n","\n"))
-            parsed_dict[section_name] = content
+            content = re.sub(pattern,"",sections[i].strip().replace("\\n","\n"))
+            parsed_dict[keys[i//2]] = content
 
         return parsed_dict
     
@@ -107,7 +111,7 @@ class FalseFacer(Ideator):
         ret_list[2]=del_list[0]
         return ret_list
     
-    def falseFace(self,roop_second:int=3)->None:
+    def falseFace(self,roop_second:int=2)->None:
         reverse_assumption_list=self._falseFaceFirstHalf()
         threads=[]
         for i in range(roop_second):
@@ -336,10 +340,18 @@ class FFGemini(FalseFacer):
         #logger.log(logging.DEBUG,f"falseface2つ目のプロンプト:\n{message}")
         #実際の挙動
         logger.log(logging.INFO,f"falsefaceの{count}回目の呼び出し")
-        api_response = self.client.generate_content(message).text
-        idea_list=self._extractIdea(api_response)
-        if len(idea_list)!=5:
-            logger.log(logging.WARNING,f"falseface{count}回目のアイデアの数は{str(len(idea_list))}個しかない")
+        roop=0
+        max_roop=3
+        while roop<max_roop:
+            api_response = self.client.generate_content(message).text
+            idea_list=self._extractIdea(api_response)
+            if len(idea_list)<4:
+                logger.log(logging.WARNING,f"falseface{count}回目{roop+1}周目のアイデアの数は{str(len(idea_list))}個しかない")
+                roop+=1
+            else:
+                break
+        if roop==max_roop:
+            raise RuntimeError(f"falsefaceの{count}回目が正常に行われなかった")
         self.improve_idea_list.extend(idea_list)
     
 class IBGPT(IdeaBox):
