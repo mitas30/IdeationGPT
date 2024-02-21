@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アイデア表示ページ</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/func1/func1_result.css')}}">
+    <script src="{{url_for('static',filename='js/func1/func1_result.js')}}" defer></script>
+</head>
+<body>
+    <div class="back-to-mypage">
+        <button class="back-button" id="backToMyPage">マイページに戻る</button>
+    </div>
+    <div class="title">
+        <h1>結果</h1>
+    </div>
+    <div class="container">
+    {% for idea in display_ideas %}
+        <div class="idea-card" id="{{loop.index}}">
+            <h2 class="idea-title">{{idea.Title}}</h2>
+            <p class="idea-summary">{{idea['Core Idea']| nl2br|safe}}</p>
+        </div>
+        <div id="popup-{{loop.index}}" class="popup">
+            <div class="popup-content">
+                <h2 class="idea-name">{{idea.Title}}</h2>
+                <button class="accordion">概要</button>
+                <div class="panel">
+                    {{idea['Core Idea']| nl2br|safe}}
+                </div>
+                <button class="accordion">使用技術</button>
+                <div class="panel">
+                    {{idea['Technologies and Materials Used']| nl2br|safe}}
+                </div>
+                <button class="accordion">問題の解決方法</button>
+                <div class="panel">
+                    {{idea['Revised Approach to Problem-Solving']| nl2br|safe}}
+                </div>
+                <button class="accordion">ユースケース</button>
+                <div class="panel">
+                    {{idea['Concrete Use Cases']| nl2br|safe}}
+                </div>
+                <button class="close">閉じる</button>
+            </div>
+        </div>  
+    {% endfor %}
+    </div>
+</body>
+</html>

@@ -11,6 +11,7 @@ from LogSettings import logger,logging
 from threading import Thread
 from deep_translator import GoogleTranslator
 from static.datastore import falsefacedata as ff,ideaboxdata as ib,brutethinkdata as bt
+from services.change_progress import ProgressChanger
 
 g_api_key=os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=g_api_key)
@@ -20,10 +21,12 @@ GEMINI_MODEL='gemini-pro'
 
 class Ideator:
     """発想法classのsuperクラス"""
-    def __init__(self,problem=""):
+    def __init__(self,problem="",thread_id=""):
         self.problem=problem
         #型はList[str]で、45個のアイデアが格納される
         self.improve_idea_list=[]
+        self.p_changer=ProgressChanger()
+        self.thread_id=thread_id
         self.idea_format="""<format>
 [Idea number]: [Idea Name] (optional)
 Core idea: [Brief explanation of the core idea]
@@ -111,8 +114,9 @@ class FalseFacer(Ideator):
         ret_list[2]=del_list[0]
         return ret_list
     
-    def falseFace(self,roop_second:int=2)->None:
+    def falseFace(self,roop_second:int=3)->None:
         reverse_assumption_list=self._falseFaceFirstHalf()
+        self.p_changer.changeEvent('falseFace:反仮定を3つ設定した',self.thread_id)
         threads=[]
         for i in range(roop_second):
             thread=Thread(target=self._falseFaceSecondHalf,args=(reverse_assumption_list[i],i+2))
@@ -121,6 +125,7 @@ class FalseFacer(Ideator):
             
         for thread in threads:
             thread.join()
+        self.p_changer.changeEvent('falseFaceのアイデア作成が終了',self.thread_id)
 
 class IdeaBox(Ideator):
     """IdeaBoxという発想法を行えるclass"""
@@ -169,6 +174,7 @@ class IdeaBox(Ideator):
     def ideaBox(self)->None:
         parameters,attribute_list=self._enumParaAndAttForProblem()     
         selected_attributes=self._selectRandAtt4Prob(attribute_list)
+        self.p_changer.changeEvent('ideaBox:問題のパラメータと属性を発見',self.thread_id)
 
         threads = []
         for i in range(3):
@@ -176,7 +182,8 @@ class IdeaBox(Ideator):
             threads.append(thread)
             thread.start()
         for thread in threads:
-            thread.join()      
+            thread.join()
+        self.p_changer.changeEvent('ideaBoxの終了',self.thread_id)
             
 class BruteThinker(Ideator):
     """発想法BruteThinkを行うclass"""       
@@ -197,6 +204,7 @@ class BruteThinker(Ideator):
     
     def bruteThink(self)->None:
         r_word_list=self._generateRandomWords(3)
+        self.p_changer.changeEvent('bruteThink:ランダムな単語の選択完了',self.thread_id)
         threads=[]
         for count in range(3):
             thread=Thread(target=self._forThread,args=(r_word_list[count],count+1))
@@ -205,6 +213,7 @@ class BruteThinker(Ideator):
             
         for thread in threads:
             thread.join()
+        self.p_changer.changeEvent('bruteThinkの完了',self.thread_id)
 
 class FFGPT(FalseFacer):
     def __init__(self, problem=""):
@@ -278,8 +287,8 @@ class FFGPT(FalseFacer):
         self.improve_idea_list.extend(idea_list)
 
 class FFGemini(FalseFacer):
-    def __init__(self, problem=""):
-        super().__init__(problem)
+    def __init__(self, problem="",thread_id=""):
+        super().__init__(problem,thread_id)
         self.client=genai.GenerativeModel(GEMINI_MODEL)
         
     def _falseFaceFirstHalf(self)->List[str]:
@@ -439,8 +448,8 @@ class IBGPT(IdeaBox):
             raise RuntimeError(f"ideaBoxの{num}回目が実行できなかった")
     
 class IBGemini(IdeaBox):
-    def __init__(self, problem=""):
-        super().__init__(problem)
+    def __init__(self, problem="",thread_id=""):
+        super().__init__(problem,thread_id)
         self.client=genai.GenerativeModel(GEMINI_MODEL)
         
     def _enumParaAndAttForProblem(self)->Tuple[str,List[str]]:
@@ -567,8 +576,8 @@ class BTGPT(BruteThinker):
         return len(idea_list)
     
 class BTGemini(BruteThinker):
-    def __init__(self, problem=""):
-        super().__init__(problem)
+    def __init__(self, problem="",thread_id=""):
+        super().__init__(problem,thread_id)
         self.client=genai.GenerativeModel(GEMINI_MODEL)
         
     #TODO:出力最大長の問題から、brutethinkは2つに分ける(属性選択とアイデア出力)
@@ -602,7 +611,7 @@ class BTGemini(BruteThinker):
                 continue
             idea_list=self._extractIdea(api_response)
             #idea毎に区切れているか確認する(本当は=5にしたいけど)
-            if 3<len(idea_list)&len(idea_list)<7:
+            if 3<=len(idea_list)&len(idea_list)<7:
                 self.improve_idea_list.extend(idea_list)
                 break
             else:

@@ -33,8 +33,8 @@ def red_login():
 
 @auth_user.route('/mypage',methods=['GET'])
 def red_mypage():
-    print(session)
-    return render_template('mypage.html')
+    name=session['user']
+    return render_template('mypage.html',username=name)
 
 #スレッドの作成
 @auth_user.route('/create_thread_api')

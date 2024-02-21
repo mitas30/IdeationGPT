@@ -2,7 +2,7 @@ import google.generativeai as genai
 from openai import OpenAI
 from typing import List
 from threading import Thread
-import re,os
+import os
 from LogSettings import logger,logging
 from .func1 import Ideator
 
@@ -11,13 +11,14 @@ GPT_MODEL="gpt-4-0125-preview"
 GEMINI_MODEL='gemini-pro'
 
 class Innovator(Ideator):
-    def __init__(self,problem:str,ideas:List[str]):
-        self.problem=problem
+    def __init__(self,problem:str,ideas:List[str],thread_id:str):
+        super().__init__(problem,thread_id)
         self.ideas=ideas
         self.all_improve_idea=[]    
 
     def scamperMethod(self):
         threads = []
+        self.p_changer.changeEvent(f'アイデア向上の発想法を{len(self.ideas)}個呼び出した',self.thread_id)
         for i in range(len(self.ideas)):
             logger.log(logging.INFO,f"scamper(アイデア向上)の{i+1}つ目の呼び出し")
             thread=Thread(target=self._doScamperMethod,args=(self.ideas[i],i+1))
@@ -95,8 +96,8 @@ Idea5:Reverse Emotion VR(Reverse)\nCore Idea:Reverse Emotion VR introduces an in
         logger.log(logging.INFO,f"scamper(アイデア向上)の{num}つ目の完了")
         
 class InoveteGemini(Innovator):
-    def __init__(self, problem: str, ideas: List[str]):
-        super().__init__(problem, ideas)
+    def __init__(self, problem: str, ideas: List[str],thread_id:str):
+        super().__init__(problem, ideas,thread_id)
         genai.configure(api_key=g_api_key)
         genai.GenerationConfig(candidate_count=1)
         self.client=genai.GenerativeModel(GEMINI_MODEL)

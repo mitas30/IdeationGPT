@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>アイデア生成待ちのページ</title>
-    </head>
-    <body>
-    <h1>Agent稼働中</h1>
-    <script src="{{url_for('static',filename='js/func1_core.js')}}"></script>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>function1-問題からアイデアを生成-の待ちページ</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/func1/func1_wait.css')}}">
+    <script src="{{url_for('static',filename='js/func1/func1_wait.js')}}" defer></script>
+</head>
+<body>
+    <div class="message-container">
+        <p>処理が進行中です。このページを離れても処理は続行されます。</p>
+    </div>
+    <div id="progress-container">
+        <div class="step">
+            <div class="step-label">アイデア生成</div>
+            <div class="circle" id="step1"></div>
+        </div>
+        <div class="step">
+            <div class="step-label">アイデア評価1</div>
+            <div class="circle" id="step2"></div>
+        </div>
+        <div class="step">
+            <div class="step-label">アイデア向上</div>
+            <div class="circle" id="step3"></div>
+        </div>
+        <div class="step">
+            <div class="step-label">アイデア評価2</div>
+            <div class="circle" id="step4"></div>
+        </div>
+    </div>
+    <div id="currentProcess">
+        直近のイベント:<span id="latest-event"></span>
+    </div>
+    <button id="backToMyPage">←マイページに戻る</button>
+</body>
 </html>

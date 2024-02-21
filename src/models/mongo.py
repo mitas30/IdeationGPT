@@ -56,6 +56,9 @@ class ThreadAdmin:
     def fetchCriterias(self,thread_id:str)->List[str]:
         doc=self.users_collection.find_one({"_id":ObjectId(thread_id)})
         return doc.get("criterias")
+    
+    def updateProgressToComplete(self,thread_id:str):
+        self.users_collection.update_one({"_id":ObjectId(thread_id)},{"$set":{"progress":3}})
         
 class IdeaAdmin:
     def __init__(self):
@@ -64,6 +67,14 @@ class IdeaAdmin:
         
     def storageIdea(self,normalize_data=dict[str,str,str,str,str,str])->None:
         return self.users_collection.insert_one(normalize_data)
+    
+    def fetchGreatIdeas(self,thread_id:str):
+        '''そのthread_idのgreatなideaを格納したcursorを返却する'''
+        return self.users_collection.find(
+            filter={'$and':[{'thread_id':thread_id},{'is_great':{"$exists":True}}]},
+            projection={'_id':False,'Title':True,'Core Idea':True,'Technologies and Materials Used':True,
+                        'Revised Approach to Problem-Solving':True,'Concrete Use Cases':True})
+        
         
     
     

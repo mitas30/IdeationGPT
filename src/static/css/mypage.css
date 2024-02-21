@@ -1,10 +1,13 @@
 .profile-container {
+    position: relative;
     width: 300px;
-    margin: auto;
     text-align: center;
-    border: 1px solid #ddd;
     padding: 20px;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.profile{
+    position: relative;
 }
 
 .clickable-thread {

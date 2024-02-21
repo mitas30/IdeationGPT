@@ -43,6 +43,8 @@ async function loadThreads() {
                 case '2':
                     window.location.href = `/input/display_wait?thread_id=${thread_id}`;
                     break;
+                case '3':
+                    window.location.href = `/func1/display_result?thread_id=${thread_id}`;
             }
         });
         threadList.appendChild(div);

@@ -2,9 +2,10 @@ from openai import OpenAI
 import google.generativeai as genai
 from typing import List
 from .func1 import Ideator
-from models.mongo import IdeaAdmin
+from models.mongo import IdeaAdmin,ThreadAdmin
 from LogSettings import logger,logging
-import re,deepl,os,concurrent.futures,copy
+import re,os,concurrent.futures,copy
+from deep_translator import GoogleTranslator
 
 g_api_key=os.getenv("GEMINI_API_KEY")
 GPT_MODEL="gpt-4-0125-preview"
@@ -13,13 +14,11 @@ GEMINI_MODEL="gemini-pro"
 genai.configure(api_key=g_api_key)
 genai.GenerationConfig(candidate_count=1)
 
-translator=deepl.Translator(os.getenv("DEEPL_API_KEY"))
-
 class IdeaEvaluator(Ideator):
     '''Idea評価の親クラス 
     実際の評価部分の関数のみLLMによって変わる'''
-    def __init__(self,problem:str,ideas:List[dict[str,str,str,str,str]],criterias:List[str]):
-        self.problem=problem
+    def __init__(self,problem:str,ideas:List[dict[str,str,str,str,str]],criterias:List[str],thread_id:str):
+        super().__init__(problem,thread_id)
         self.selected_criterias=criterias
         #アイデアごとにdictで保存されたList
         self.pre_evaluate_idea=ideas
@@ -61,6 +60,7 @@ class IdeaEvaluator(Ideator):
                 for result in results:
                     eval_responses+=result
             concurrent_count+=1
+            self.p_changer.changeEvent(f'アイデア評価:{25*concurrent_count}個までのアイデアを評価',self.thread_id)
         print("evaluate_full_page:\n",eval_responses)
         idea_num=self._extractPoints(eval_responses)
         return idea_num
@@ -75,16 +75,10 @@ class IdeaEvaluator(Ideator):
             self.great_ideas.append(self.pre_evaluate_idea[self.idea_score_list[i][1]])
         #上位のselect_idea_num個をidea_score_listから消去する
         del self.idea_score_list[:select_idea_num]
-            
-    #TODO redisを使用しない
-    def translateText(english_result:str)->None:
-        """表示するいいアイデアを日本語に翻訳する"""
-        ja_result=translator.translate_text(english_result,target_lang="JA")
-        r.rpush(ja_result[0].text)
 
 class EvaluateGPT(IdeaEvaluator):
-    def __init__(self,problem:str,ideas:List[dict[str,str,str,str,str]],criterias:List[str]):
-        super().__init__(problem,ideas,criterias)
+    def __init__(self,problem:str,ideas:List[dict[str,str,str,str,str]],criterias:List[str],thread_id:str):
+        super().__init__(problem,ideas,criterias,thread_id)
         self.client=OpenAI()
     
     def _evaluateIdea(self,pre_evaluate_ideas:dict[str,str,str,str,str])->str:
@@ -163,10 +157,10 @@ Concrete Use Cases:This platform caters to a wide range of emotional interaction
                 print(part)
         return response
     
-
 class EvaluateGemini(IdeaEvaluator):
-    def __init__(self,problem:str,ideas:List[dict[str,str,str,str,str]],criterias:List[str]):
-        super().__init__(problem,ideas,criterias)
+    def __init__(self,problem:str,ideas:List[dict[str,str,str,str,str]],criterias:List[str],thread_id:str):
+        super().__init__(problem,ideas,criterias,thread_id)
+
         self.client=genai.GenerativeModel(GEMINI_MODEL)
         
     def _evaluateIdea(self,pre_evaluate_ideas:dict[str,str,str,str,str])->str:
@@ -252,11 +246,38 @@ class IdeaHandler:
     
     def storageIdea(self,idea_structured:dict[str,str,str,str,str],thread_id:str,is_great:bool=False)->None:
         """使用したIdea、またはgreatなアイデアを格納する。
-        ただし、クライアント側にmongoのデータを渡さないためにidea_structuredは複製する"""
+        ただし、クライアント側にmongoのデータを渡さないためにidea_structuredは複製する
+        また、Ideaを入れた時点で、threadの状態をcompleteに更新する"""
         i_admin=IdeaAdmin()
+        t_admin=ThreadAdmin()
         save_idea=copy.deepcopy(idea_structured)
         save_idea['thread_id']=thread_id
         if is_great==True:
             save_idea['is_great']=True
         i_admin.storageIdea(save_idea)
+        if is_great==True:
+            t_admin.updateProgressToComplete(thread_id)
+        return None
+    
+    def _translateToJA(self,en_idea_structured:dict[str,str,str,str,str])->dict[str,str,str,str,str]:
+        '''構造化されたアイデアを全て日本語にして返す
+        また、読みやすいように。の後は\nをつける'''
+        translator = GoogleTranslator(source='en', target='ja')
+        translated_idea={}
+        for att,value in en_idea_structured.items():
+            translated_idea[att]=re.sub(r"。",r"。\n",translator.translate(text=value))
+        print(translated_idea['Core Idea'])
+        return translated_idea
+    
+    def fetchGreatIdeas(self,thread_id:str)->list[dict[str,str,str,str,str]]:
+        '''GreatIdeaをList[dict[str,str...]]で返す'''
+        i_admin=IdeaAdmin()
+        cursor=i_admin.fetchGreatIdeas(thread_id)
+        # ThreadPoolExecutorを使用して並行処理
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures=[]
+            for doc in cursor:
+                futures.append(executor.submit(self._translateToJA,doc))
+            great_ideas_structured = [future.result() for future in concurrent.futures.as_completed(futures)]
+        return great_ideas_structured
         
