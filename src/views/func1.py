@@ -46,7 +46,7 @@ def evaluateIdeas(problem,idea_list:list[dict[str,str,str,str,str]],criterias:li
     '''アイデア評価のstep'''
     p_changer=ProgressChanger()
     thread_id=session['thread_id']
-    evaluator=EvaluateGemini(problem,idea_list,criterias,thread_id)
+    evaluator=EvaluateGPT(problem,idea_list,criterias,thread_id)
     p_changer.changeEvent(f"アイデア評価の開始",thread_id)
     idea_num=evaluator.concurrentEvaluate()
     logger.log(logging.INFO,f"評価済みアイデアの数:{idea_num}個")

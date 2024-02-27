@@ -51,7 +51,7 @@ Therefore, although a 400-word explanation may seem lengthy at first glance, it 
         sections = re.split(section_pattern, re.sub("\*","",full_idea))
         if len(sections)!=9:
             logger.log(logging.ERROR,f"正規化エラー:正常なsectionは9つに対して、今回は{str(len(sections))}")
-            with open("D:\Programing\自主制作(code)\IdeationGPT\src\static\datastore\error_log.txt","a",encoding="utf-8") as file:
+            with open("D:\Programing\自主制作_code\IdeationGPT\src\static\datastore\error_log.txt","a",encoding="utf-8") as file:
                 file.write(f"正規化エラー:正常なsectionは9つに対して、今回は{str(len(sections))}\n")
                 i=1
                 for section in sections:
