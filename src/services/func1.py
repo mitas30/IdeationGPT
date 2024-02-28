@@ -315,7 +315,7 @@ class FFGemini(FalseFacer):
 "role":"assistant", "content":{assistant_answer_message },
 "role":"user","content":{user_message}"""
         
-        #logger.log(logging.DEBUG,message)
+        #logger.log(logging.INFO,message)
         api_response = self.client.generate_content(message).text
         try:
             logger.log(logging.DEBUG,f"falsefaceの1回目\nAnswerは:\n{api_response}")
@@ -349,6 +349,7 @@ class FFGemini(FalseFacer):
         #logger.log(logging.DEBUG,f"falseface2つ目のプロンプト:\n{message}")
         #実際の挙動
         logger.log(logging.INFO,f"falsefaceの{count}回目の呼び出し")
+        #logger.log(logging.INFO,user_example_message)
         roop=0
         max_roop=3
         while roop<max_roop:
@@ -510,7 +511,7 @@ class IBGemini(IdeaBox):
 "role":"assistant", "content":{aans_message }
 "role":"user","content":{user_message}"""
         
-        #logger.log(logging.DEBUG,message[:100])
+        #logger.log(logging.INFO,message)
         count=0
         max_count=3
         logger.log(logging.INFO,f"ideaBoxの{num}回目の呼び出し")

@@ -226,6 +226,7 @@ Concrete Use Cases:This platform caters to a wide range of emotional interaction
 "role":"assistant", "content": {assistant_answer_message},
 "role":"user","content":{user_message}'''
 
+        logger.log(logging.INFO,message)
         current_roop=0
         max_roop=3
         while current_roop<max_roop:  

@@ -6,7 +6,7 @@ root_path=Path(__file__).parent.parent.parent
 sys.path.append(str(root_path))
 
 from src.LogSettings import logger,logging
-import src.services.GPT.func1 as Func1
+import src.services.func1 as Func1
 
 class TestUnitFalseFace:
     """FalseFace(func1)をtestするためのobject"""
@@ -217,7 +217,6 @@ Idea 5: "Multilingual Radio EdTech" (Attribute Set 5)\nCore Idea:\n"Multilingual
     def testLengthOfIdeaUsingIdeaBox(self,test_list:list):
         assert len(test_list)==5,"IdeaBoxによって出されたideaのリストの長さは5ではなく，"+str(len(test_list))+"である。"
     
-        
 class TestUnifyIdeaBox:
     """openAIのAPIを動かす方のIdeaBoxのtest assertは使えなくてもtestしよう"""
     def __init__(self,problem:str):
@@ -300,10 +299,9 @@ class TestUnifyBruteThink:
     """OpenAIのAPIを動かすtest"""
     
 class TestIntegrateFunc1:
-    """Func1を通しで行う統合test"""
-        
+    """Func1を通しで行う統合test"""    
 
-
+"""
 obj=TestUnitFalseFace()
 obj.testLenExReversedAssumption()
 obj.testReversedAssumption()
@@ -325,7 +323,7 @@ obj.checkRandomStrFormat()
 #obj.displayRandomWordsStr(test_list)
 
 #OpenAIのAPIを使った検証
-"""
+
 obj=TestUnitFalseFace()
 logger.log(logging.INFO,"FalseFace1回目の検証")
 test_list,reverse_assumption_list=obj.doFalseFaceFH()

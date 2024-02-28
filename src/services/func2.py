@@ -155,6 +155,8 @@ Idea5:Reverse Emotion VR(Reverse)\nCore Idea:Reverse Emotion VR introduces an in
                 "role":"assistant", "content": {assistant_answer_message},
                 "role":"user","content":{user_message}"""
                 
+        #logger.log(logging.INFO,system_message)
+        #logger.log(logging.INFO,user_example_message)        
         api_response=self.client.generate_content(message).text
         normalized_list=self._extractIdea(api_response)
         print(f"list長:{str(len(normalized_list))}")
