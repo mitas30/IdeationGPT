@@ -19,7 +19,8 @@ https://github.com/mitas30/IdeationGPT/assets/83048191/d0539d84-369f-43be-8003-4
 
 # 技術概要
 ## Workflow 
-[図](URL)
+![ソフトウェア概要](https://github.com/mitas30/IdeationGPT/assets/83048191/e81abcc6-c652-4dd1-9e3b-f18f8d2c2bba)
+
 ## 使用したツールなど  
 ### python:
 - [Gemmini-Pro](https://platform.openai.com/docs/api-reference/chat)/[GPT4](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)
